@@ -10,19 +10,7 @@ import {
 } from "@react-three/drei";
 import { useRef } from "react";
 import * as THREE from "three";
-import { getProject, val, types } from "@theatre/core";
-import studio from "@theatre/studio";
-import { extension as theatreExtension } from "@theatre/r3f";
 import { EffectComposer, Bloom, Glitch } from "@react-three/postprocessing";
-
-studio.initialize();
-studio.extend(theatreExtension);
-
-const project = getProject("SciFi Cinematic Scene");
-const sheet = project.sheet("Scene");
-const cameraObj = sheet.object("Camera", {
-  position: types.compound([0, 2, 10]),
-});
 
 const FloatingObjects = () => {
   return (
@@ -75,10 +63,7 @@ const SciFiMonolith = () => {
 export default function SciFiExperience() {
   return (
     <div className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
-      <Canvas
-        camera={{ position: val(cameraObj.props.position) }}
-        theatre={sheet}
-      >
+      <Canvas camera={{ position: [0, 2, 10] }}>
         <ambientLight intensity={0.3} />
         <spotLight position={[5, 5, 5]} intensity={2} color={"#00d4ff"} />
         <Stars radius={50} depth={50} count={1000} factor={4} fade speed={2} />
