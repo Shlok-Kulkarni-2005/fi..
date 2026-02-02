@@ -14,9 +14,24 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+/**
+ * Lazily initialize Stripe to avoid throwing during Next.js build
+ * when `STRIPE_SECRET_KEY` is not present in the build environment.
+ */
+let stripe: Stripe | null = null;
 
-
+function getStripe(): Stripe {
+  if (!stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error(
+        "STRIPE_SECRET_KEY is not set. Configure it in your Vercel environment variables."
+      );
+    }
+    stripe = new Stripe(key);
+  }
+  return stripe;
+}
 
 export async function POST(req: Request) {
   try {
@@ -26,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
       line_items: [
